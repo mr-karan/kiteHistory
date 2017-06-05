@@ -1,14 +1,43 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import argparse
 import csv
+from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
+from logging import DEBUG
 from os import getenv
+from sys import exit
+
+import requests
 
 import pandas as pd
-import requests
 from kiteconnect import KiteConnect
-
-from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
 from scaffold import *
+
+parser = argparse.ArgumentParser(prog='kiteHistory')
+parser.add_argument('-s', '--symbol', action='store', type=str,
+                    help='Specify Trading Symbol ', required=True)
+parser.add_argument('-i', '--interval', action='store', type=str,
+                    help='''Specify interval. Possible values are
+					· day
+					· 3minute
+					· 5minute
+					· 10minute
+					· 15minute
+					· 30minute
+					· 60minute
+					''', required=True)
+parser.add_argument('-f', '--from_date', action='store', type=str,
+                    help='Specify yyyy-mm-dd formatted date indicating the start date of records.', required=True)
+parser.add_argument('-t', '--to_date', action='store', type=str,
+                    help='Specify yyyy-mm-dd formatted date indicating the end date of records.', required=True)
+
+parser.add_argument('-V', '--verbose', action='store_true',
+                    help='Show more information on what''s happening.')
+
+args = parser.parse_args()
+
+if args.verbose:
+    log.setLevel(DEBUG)
 
 KITE_API_KEY = getenv('KITE_API_KEY')
 KITE_REQUEST_TOKEN = getenv('KITE_REQUEST_TOKEN')
@@ -75,7 +104,8 @@ def get_history(symbol, from_date, to_date, interval, exchange='NSE'):
 
 
 def main():
-    print(get_history('INFY', '2017-05-18', '2017-05-19', 'minute', 'NSE'))
+    print(get_history(args.symbol, args.from_date,
+                      args.to, args.interval, args.exchange))
 
 
 if __name__ == '__main__':
