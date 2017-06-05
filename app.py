@@ -94,7 +94,7 @@ def get_history(kite_instance, symbol, from_date, to_date, interval, exchange='N
     """
     # if csv not found
     try:
-        df = pd.read_csv('temp.csv')
+        df = pd.read_csv('data.csv')
 
     except FileNotFoundError:
         with requests.Session() as s:
@@ -108,7 +108,7 @@ def get_history(kite_instance, symbol, from_date, to_date, interval, exchange='N
             for line in my_list:
                 writer.writerow(line)
 
-        df = pd.read_csv('temp.csv')
+        df = pd.read_csv('data.csv')
 
     try:
         result = df.query(
