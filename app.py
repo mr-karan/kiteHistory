@@ -2,42 +2,30 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import csv
-from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
 from logging import DEBUG
-from os import getenv, curdir, path
+from os import curdir, getenv, path
 from sys import exit
 
-import requests
-
 import pandas as pd
+import requests
 from kiteconnect import KiteConnect
+
+from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
 from scaffold import *
 
 parser = argparse.ArgumentParser(prog='kiteHistory')
 parser.add_argument('-s', '--symbol', action='store', type=str,
                     help='Specify Trading Symbol ', required=True)
 parser.add_argument('-i', '--interval', action='store', type=str,
-                    help='''Specify interval. Possible values are
-					· day
-					· 3minute
-					· 5minute
-					· 10minute
-					· 15minute
-					· 30minute
-					· 60minute''', required=True)
+                    help='''Specify interval. Possible values are · day · 3minute
+					· 5minute · 10minute · 15minute · 30minute · 60minute''', required=True)
 parser.add_argument('-f', '--from_date', action='store', type=str,
                     help='Specify yyyy-mm-dd formatted date indicating the start date of records.', required=True)
 parser.add_argument('-t', '--to_date', action='store', type=str,
                     help='Specify yyyy-mm-dd formatted date indicating the end date of records.', required=True)
 parser.add_argument('-e', '--exchange', action='store', type=str,
                     help='''Specify exchange name.
-                    ·BSE,
-                    ·NFO,
-                    ·CDS,
-                    ·MCX,
-                    ·MCXSX,
-                    ·BFO
-                    ''', required=True)
+                    ·BSE, ·NFO, ·CDS, ·MCX, ·MCXSX, ·BFO ''', required=True)
 parser.add_argument('-p', '--path', action='store', default=curdir,
                     help='Set the path to store token keys and data dumps. Defaults to current directory')
 parser.add_argument('-V', '--verbose', action='store_true',
@@ -56,6 +44,9 @@ CSV_URL = "https://api.kite.trade/instruments?api_key='{}'".format(
 
 
 def initialize_kite():
+    """
+    Helper function to initialize Kite.
+    """
     kite = KiteConnect(api_key=KITE_API_KEY)
 
     try:
@@ -89,11 +80,18 @@ def initialize_kite():
     return kite
 
 
-def get_history(kite_instance, symbol, from_date, to_date, interval, exchange='NSE'):
+def get_history(kite_instance, symbol, from_date, to_date, interval, exchange):
     """
-    can be used this w/o cli
-    :param symbol:
-    :return:
+    params 
+        - kite_instance: <kiteconnect.KiteConnect object>
+        - symbol(str): Stock's Trading Symbol
+        - from_date(str): YYYY-MM-DD formatted date indicating the start date of records
+        - to_date(str): YYYY-MM-DD formatted date indicating the end date of records
+        - interval(str): Specify interval between tick data.
+        - exchange(str): Specify exchange name.
+
+    return
+        -result_data(List): object with filtered data.
     """
     # if csv not found
     try:
@@ -128,6 +126,11 @@ def get_history(kite_instance, symbol, from_date, to_date, interval, exchange='N
 
 
 def write_to_csv(stock_data, name):
+    """
+    params:
+        - stock_data(list) : list of dict objects containing stock data
+        - name(str) : output file name specified by `-output` param.
+    """
     with open(path.join(args.path, name), 'w') as the_file:
         fieldnames = ['date', 'open', 'high', 'low', 'close', 'volume']
         writer = csv.DictWriter(the_file, fieldnames=fieldnames)
@@ -142,7 +145,7 @@ def main():
                          args.to_date, args.interval, args.exchange)
 
     if args.output:
-        write_to_csv(result, 'result.csv')
+        write_to_csv(result, args.output)
     else:
         print(result)
 
