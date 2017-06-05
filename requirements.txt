@@ -1,0 +1,11 @@
+appdirs==1.4.3
+kiteconnect==3.4.1
+numpy==1.12.1
+packaging==16.8
+pandas==0.20.1
+pyparsing==2.2.0
+python-dateutil==2.6.0
+pytz==2017.2
+requests==2.14.2
+six==1.10.0
+websocket-client==0.40.0
