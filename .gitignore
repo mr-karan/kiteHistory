@@ -90,4 +90,5 @@ ENV/
 
 .idea/
 .vscode/
-.csv
+*.csv
+*.ini

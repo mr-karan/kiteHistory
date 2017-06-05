@@ -106,7 +106,7 @@ def get_history(symbol, from_date, to_date, interval, exchange='NSE'):
 
 def main():
     print(get_history(args.symbol, args.from_date,
-                      args.to, args.interval, args.exchange))
+                      args.to_date, args.interval, args.exchange))
 
 
 if __name__ == '__main__':
