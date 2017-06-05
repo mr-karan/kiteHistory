@@ -30,7 +30,8 @@ parser.add_argument('-f', '--from_date', action='store', type=str,
                     help='Specify yyyy-mm-dd formatted date indicating the start date of records.', required=True)
 parser.add_argument('-t', '--to_date', action='store', type=str,
                     help='Specify yyyy-mm-dd formatted date indicating the end date of records.', required=True)
-
+parser.add_argument('-e', '--exchange', action='store', type=str,
+                    help='Specify exchange name. NSE/BSE', required=True)
 parser.add_argument('-V', '--verbose', action='store_true',
                     help='Show more information on what''s happening.')
 
