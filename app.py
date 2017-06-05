@@ -42,6 +42,9 @@ parser.add_argument('-p', '--path', action='store', default=curdir,
                     help='Set the path to store token keys and data dumps. Defaults to current directory')
 parser.add_argument('-V', '--verbose', action='store_true',
                     help='Show more information on what''s happening.')
+parser.add_argument('-o', '--output', action='store', type=str,
+                    help='Specify name of output file (csv)', required=False)
+
 
 args = parser.parse_args()
 
@@ -124,10 +127,24 @@ def get_history(kite_instance, symbol, from_date, to_date, interval, exchange='N
         exit()
 
 
+def write_to_csv(stock_data, name):
+    with open(path.join(args.path, name), 'w') as the_file:
+        fieldnames = ['date', 'open', 'high', 'low', 'close', 'volume']
+        writer = csv.DictWriter(the_file, fieldnames=fieldnames)
+        writer.writeheader()
+        for line in stock_data:
+            writer.writerow(line)
+
+
 def main():
     kite_instance = initialize_kite()
-    print(get_history(kite_instance, args.symbol, args.from_date,
-                      args.to_date, args.interval, args.exchange))
+    result = get_history(kite_instance, args.symbol, args.from_date,
+                         args.to_date, args.interval, args.exchange)
+
+    if args.output:
+        write_to_csv(result, 'result.csv')
+    else:
+        print(result)
 
 
 if __name__ == '__main__':
