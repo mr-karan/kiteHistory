@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(levelname)s: %(asctime)s -'
                     ' %(funcName)s - %(message)s')
 
-log = logging.getLogger('kite-history')
+log = logging.getLogger('kiteHistory')
 
 
 def check_for_tokens():
@@ -29,12 +29,12 @@ def check_for_tokens():
 
     if kite_api_key is None or kite_secret is None:
         print('''
-            You need to add your Kite API token, \n
-            along with Secret key.
+            You need to add your Kite API token,
+            along with Secret Key. \n
             export KITE_API_KEY='your-kite-api-key'
             export KITE_SECRET='your-kite-secret-key'
             \n
-            You can check it here : https://developers.kite.trade/apps
+            You can fetch it from here : https://developers.kite.trade/apps
         ''')
         return False
 
@@ -42,9 +42,9 @@ def check_for_tokens():
 
     if kite_request_token is None:
         print('''
-            Get your request token. \n You can do this by
-            setting environment variables like so:
-            export MERCURY_API_KEY='your-mercury-api-key'
+            Set your request token.
+            You can do this by setting environment variables: \n
+            export KITE_REQUEST_TOKEN='your-kite-request-token' \n
             Generate request token from 
             https://kite.trade/connect/login?api_key=<>
             ''')

@@ -4,7 +4,7 @@ import argparse
 import csv
 from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
 from logging import DEBUG
-from os import getenv
+from os import getenv, curdir, path
 from sys import exit
 
 import requests
@@ -24,14 +24,22 @@ parser.add_argument('-i', '--interval', action='store', type=str,
 					· 10minute
 					· 15minute
 					· 30minute
-					· 60minute
-					''', required=True)
+					· 60minute''', required=True)
 parser.add_argument('-f', '--from_date', action='store', type=str,
                     help='Specify yyyy-mm-dd formatted date indicating the start date of records.', required=True)
 parser.add_argument('-t', '--to_date', action='store', type=str,
                     help='Specify yyyy-mm-dd formatted date indicating the end date of records.', required=True)
 parser.add_argument('-e', '--exchange', action='store', type=str,
-                    help='Specify exchange name. NSE/BSE', required=True)
+                    help='''Specify exchange name.
+                    ·BSE,
+                    ·NFO,
+                    ·CDS,
+                    ·MCX,
+                    ·MCXSX,
+                    ·BFO
+                    ''', required=True)
+parser.add_argument('-p', '--path', action='store', default=curdir,
+                    help='Set the path to store token keys and data dumps. Defaults to current directory')
 parser.add_argument('-V', '--verbose', action='store_true',
                     help='Show more information on what''s happening.')
 
@@ -40,40 +48,45 @@ args = parser.parse_args()
 if args.verbose:
     log.setLevel(DEBUG)
 
-KITE_API_KEY = getenv('KITE_API_KEY')
-KITE_REQUEST_TOKEN = getenv('KITE_REQUEST_TOKEN')
-KITE_SECRET = getenv('KITE_SECRET')
 CSV_URL = "https://api.kite.trade/instruments?api_key='{}'".format(
     KITE_API_KEY)
 
-kite = KiteConnect(api_key=KITE_API_KEY)
 
-try:
-    with open('token.ini', 'r') as the_file:
-        access_token = the_file.readline()
-        try:
-            kite.set_access_token(access_token)
-
-        except Exception as e:
-            print("Authentication failed", str(e))
-            raise
-
-except FileNotFoundError:
-    user = kite.request_access_token(
-        request_token=KITE_REQUEST_TOKEN, secret=KITE_SECRET)
-
-    with open('token.ini', 'w') as the_file:
-        the_file.write(user['access_token'])
+def initialize_kite():
+    kite = KiteConnect(api_key=KITE_API_KEY)
 
     try:
-        kite.set_access_token(user["access_token"])
+        with open(path.join(args.path, 'token.ini'), 'r') as the_file:
+            access_token = the_file.readline()
+            try:
+                kite.set_access_token(access_token)
 
-    except Exception as e:
-        print("Authentication failed", str(e))
-        raise
+            except Exception as e:
+                log.error("Authentication failed {}".format(str(e)))
+                raise
+
+    except FileNotFoundError:
+        try:
+            user = kite.request_access_token(
+                request_token=KITE_REQUEST_TOKEN, secret=KITE_SECRET)
+        except Exception as e:
+            log.error("{}".format(str(e)))
+            exit()
+
+        with open(path.join(args.path, 'token.ini'), 'w') as the_file:
+            the_file.write(user['access_token'])
+
+        try:
+            kite.set_access_token(user["access_token"])
+
+        except Exception as e:
+            log.error("Authentication failed {}".format(str(e)))
+            raise
+
+    return kite
 
 
-def get_history(symbol, from_date, to_date, interval, exchange='NSE'):
+def get_history(kite_instance, symbol, from_date, to_date, interval, exchange='NSE'):
     """
     can be used this w/o cli
     :param symbol:
@@ -89,23 +102,31 @@ def get_history(symbol, from_date, to_date, interval, exchange='NSE'):
             decoded_content = download.content.decode('utf-8')
             cr = csv.reader(decoded_content.splitlines(), delimiter=',')
             my_list = list(cr)
-        with open('temp.csv', "w") as the_file:
+
+        with open(path.join(args.path, 'data.csv'), 'w') as the_file:
             writer = csv.writer(the_file, delimiter=',')
             for line in my_list:
                 writer.writerow(line)
+
         df = pd.read_csv('temp.csv')
 
-    result = df.query(
-        "tradingsymbol=='{0}' and exchange=='{1}'".format(symbol, exchange))
-    # filter exchange in query too
-    token = result.iloc[0][0]
-    # use token with kite api
-    d = kite.historical(token, from_date, to_date, interval)
-    return d
+    try:
+        result = df.query(
+            "tradingsymbol=='{0}' and exchange=='{1}'".format(symbol, exchange))
+        token = result.iloc[0][0]
+        result_data = kite_instance.historical(
+            token, from_date, to_date, interval)
+        return result_data
+
+    except IndexError as e:
+        log.error("Cannot find any data.")
+        log.debug(str(e))
+        exit()
 
 
 def main():
-    print(get_history(args.symbol, args.from_date,
+    kite_instance = initialize_kite()
+    print(get_history(kite_instance, args.symbol, args.from_date,
                       args.to_date, args.interval, args.exchange))
 
 
