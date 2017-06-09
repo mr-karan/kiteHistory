@@ -11,7 +11,7 @@
 
 [![asciicast](https://asciinema.org/a/124056.png)](https://asciinema.org/a/124056)
 
-###Options : 
+### Options : 
 
     --symbol                         Stock symbol of the instrument.
     --interval                       Time interval for the tick data.
