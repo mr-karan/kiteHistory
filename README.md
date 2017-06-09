@@ -18,14 +18,16 @@
     --from_date                      Start date indicating the start of records.
     --to_date                        End date indicating the end of records.
     --exchange                       Exchange Name. (MCX/NSE/BSE/NFO/CDS/BFO/MCXSX)
-    --output                         Output path to save `csv`
+    --output                         Output filename to save `csv`
+    --path                           Specify path to directory to store instruments master 
+                                     along with access token keys
     --verbose                        Enable verbose logging
 
 ### Example Usage : 
 
     kitehistory -s TCS -i day -f 2017-05-15 -t 2017-06-05 -e NSE -o TCS.csv --verbose 
 
-![img](addlink)
+![img](screens/tcs.png)
 
 ### First Time Setup
 
@@ -39,10 +41,18 @@
 
 ``` 
 
+### How it works ?
+
+Kite API requires instrument-token to fetch the historical data. The idea behind this wrapper is to fetch the instruments
+master file and query it for the required symbol to fetch instrument token. Once the token is fetched, it uses Kite's API
+to get the historical data and saves the output in a `.csv` ready for analysis etc. 
+
 ## Credits
 
 - [pandas](http://pandas.pydata.org/)
 - [Kite API](https://developers.kite.trade/apps/)
+- [pykiteconnect](pykiteconnect)
+- [requests](http://docs.python-requests.org/en/master/)
 
 
 ## Contributing

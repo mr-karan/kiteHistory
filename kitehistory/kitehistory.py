@@ -10,8 +10,8 @@ import pandas as pd
 import requests
 from kiteconnect import KiteConnect
 
-from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
-from scaffold import *
+from .config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
+from .scaffold import *
 
 parser = argparse.ArgumentParser(prog='kiteHistory')
 parser.add_argument('-s', '--symbol', action='store', type=str,
