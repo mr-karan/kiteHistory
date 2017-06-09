@@ -9,7 +9,7 @@
 
     pip install kitehistory
 
-[![asciicast](https://asciinema.org/a/.png)](https://asciinema.org/a/)
+[![asciicast](https://asciinema.org/a/124056.png)](https://asciinema.org/a/124056)
 
 ###Options : 
 
@@ -51,7 +51,7 @@ to get the historical data and saves the output in a `.csv` ready for analysis e
 
 - [pandas](http://pandas.pydata.org/)
 - [Kite API](https://developers.kite.trade/apps/)
-- [pykiteconnect](pykiteconnect)
+- [pykiteconnect](https://kite.trade/docs/pykiteconnect/)
 - [requests](http://docs.python-requests.org/en/master/)
 
 
