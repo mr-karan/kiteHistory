@@ -9,7 +9,7 @@
 
     pip install kitehistory
 
-[![asciicast](https://asciinema.org/a/124056.png)](https://asciinema.org/a/124056)
+[![asciicast](https://asciinema.org/a/124280.png)](https://asciinema.org/a/124280)
 
 ### Options : 
 
@@ -25,9 +25,10 @@
 
 ### Example Usage : 
 
-    kitehistory -s TCS -i day -f 2017-05-15 -t 2017-06-05 -e NSE -o TCS.csv --verbose 
+    kitehistory -s TCS -i day -f 2017-05-15 -t 2017-06-05 -e NSE -o --plot 
 
-![img](screens/tcs.png)
+![img](screens/tcs_data.png)
+![img](screens/tcs_plot.png)
 
 ### First Time Setup
 
