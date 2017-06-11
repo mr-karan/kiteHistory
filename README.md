@@ -65,3 +65,6 @@ Feel free to report any issues and/or send PRs for additional features.
 
 MIT © Karan Sharma 
 [LICENSE included here](LICENSE)
+
+
+I did some data crunching using this library and wrote a blog post about it [here](https://medium.com/p/stay-away-from-the-noise-ed9e610804c5)
