@@ -6,12 +6,15 @@ from logging import DEBUG
 from os import curdir, getenv, path
 from sys import exit
 
+import numpy as np
 import pandas as pd
 import requests
 from kiteconnect import KiteConnect
 
-from .config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
-from .scaffold import *
+from bokeh.plotting import figure, output_file, show
+
+from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
+from scaffold import *
 
 parser = argparse.ArgumentParser(prog='kiteHistory')
 parser.add_argument('-s', '--symbol', action='store', type=str,
@@ -30,9 +33,10 @@ parser.add_argument('-p', '--path', action='store', default=curdir,
                     help='Set the path to store token keys and data dumps. Defaults to current directory')
 parser.add_argument('-V', '--verbose', action='store_true',
                     help='Show more information on what''s happening.')
-parser.add_argument('-o', '--output', action='store', type=str,
-                    help='Specify name of output file (csv)', required=False)
-
+parser.add_argument('-o', '--output', action='store_true',
+                    help='Set flag to store data in csv file', required=False)
+parser.add_argument('--plot', action='store_true',
+                    help='Set flag to plot data in html file', required=False)
 
 args = parser.parse_args()
 
@@ -41,6 +45,13 @@ if args.verbose:
 
 CSV_URL = "https://api.kite.trade/instruments?api_key='{}'".format(
     KITE_API_KEY)
+
+
+def datetime(x):
+    """
+    Helper function to convert list of string objects to np.datetime64 objects.
+    """
+    return np.array(x, dtype=np.datetime64)
 
 
 def initialize_kite():
@@ -82,7 +93,7 @@ def initialize_kite():
 
 def get_history(kite_instance, symbol, from_date, to_date, interval, exchange):
     """
-    params 
+    params
         - kite_instance: <kiteconnect.KiteConnect object>
         - symbol(str): Stock's Trading Symbol
         - from_date(str): YYYY-MM-DD formatted date indicating the start date of records
@@ -95,7 +106,7 @@ def get_history(kite_instance, symbol, from_date, to_date, interval, exchange):
     """
     # if csv not found
     try:
-        df = pd.read_csv('data.csv')
+        df = pd.read_csv('INSTRUMENTS_MASTER.csv')
 
     except FileNotFoundError:
         with requests.Session() as s:
@@ -104,12 +115,12 @@ def get_history(kite_instance, symbol, from_date, to_date, interval, exchange):
             cr = csv.reader(decoded_content.splitlines(), delimiter=',')
             my_list = list(cr)
 
-        with open(path.join(args.path, 'data.csv'), 'w') as the_file:
+        with open(path.join(args.path, 'INSTRUMENTS_MASTER.csv'), 'w') as the_file:
             writer = csv.writer(the_file, delimiter=',')
             for line in my_list:
                 writer.writerow(line)
 
-        df = pd.read_csv('data.csv')
+        df = pd.read_csv('INSTRUMENTS_MASTER.csv')
 
     try:
         result = df.query(
@@ -131,7 +142,7 @@ def write_to_csv(stock_data, name):
         - stock_data(list) : list of dict objects containing stock data
         - name(str) : output file name specified by `-output` param.
     """
-    with open(path.join(args.path, name), 'w') as the_file:
+    with open(path.join(args.path, name + '.csv'), 'w') as the_file:
         fieldnames = ['date', 'open', 'high', 'low', 'close', 'volume']
         writer = csv.DictWriter(the_file, fieldnames=fieldnames)
         writer.writeheader()
@@ -139,15 +150,42 @@ def write_to_csv(stock_data, name):
             writer.writerow(line)
 
 
+def plot_csv(stock_data, symbol):
+    """
+    params:
+        - stock_data(list) : list of dict objects containing stock data
+        - name(str) : output file name specified by `-output` param.
+    """
+
+    try:
+        df = pd.read_csv('{}.csv'.format(symbol))
+
+    except:
+        write_to_csv(stock_data, symbol)
+        df = pd.read_csv('{}.csv'.format(symbol))
+
+    p1 = figure(x_axis_type="datetime", title="Stock Closing Price")
+    p1.grid.grid_line_alpha = 0.3
+    p1.xaxis.axis_label = 'Date'
+    p1.yaxis.axis_label = 'Price'
+
+    p1.line(datetime(list(df['date'])), list(df['close']),
+            color='#A6CEE3', legend=symbol)
+    output_file("{}.html".format(symbol), title="Stock Closing Prices")
+
+    show(p1)  # open a browser
+
+
 def main():
     kite_instance = initialize_kite()
     result = get_history(kite_instance, args.symbol, args.from_date,
                          args.to_date, args.interval, args.exchange)
 
+    if args.plot:
+        plot_csv(result, args.symbol)
+
     if args.output:
-        write_to_csv(result, args.output)
-    else:
-        print(result)
+        write_to_csv(result, args.symbol)
 
 
 if __name__ == '__main__':
