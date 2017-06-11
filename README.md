@@ -18,7 +18,8 @@
     --from_date                      Start date indicating the start of records.
     --to_date                        End date indicating the end of records.
     --exchange                       Exchange Name. (MCX/NSE/BSE/NFO/CDS/BFO/MCXSX)
-    --output                         Output filename to save `csv`
+    --output                         Set flag to save data in csv format
+    --plot                           Set flag to plot chart in html format
     --path                           Specify path to directory to store instruments master 
                                      along with access token keys
     --verbose                        Enable verbose logging
@@ -54,7 +55,6 @@ to get the historical data and saves the output in a `.csv` ready for analysis e
 - [Kite API](https://developers.kite.trade/apps/)
 - [pykiteconnect](https://kite.trade/docs/pykiteconnect/)
 - [requests](http://docs.python-requests.org/en/master/)
-
 
 ## Contributing
 
