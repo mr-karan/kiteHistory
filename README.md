@@ -54,7 +54,7 @@ to get the historical data and saves the output in a `.csv` ready for analysis e
 - [Kite API](https://developers.kite.trade/apps/)
 - [pykiteconnect](https://kite.trade/docs/pykiteconnect/)
 - [requests](http://docs.python-requests.org/en/master/)
-
+- [bokeh](http://bokeh.pydata.org/en/latest/)
 
 ## Contributing
 
