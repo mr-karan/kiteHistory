@@ -11,7 +11,7 @@ except (IOError, ImportError):
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-version = '1.4'
+version = '1.5'
 
 setup(
     name='kitehistory',

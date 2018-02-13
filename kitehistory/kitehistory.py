@@ -13,8 +13,8 @@ from kiteconnect import KiteConnect
 
 from bokeh.plotting import figure, output_file, show
 
-from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
-from scaffold import log,check_for_tokens
+from .config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
+from .scaffold import log,check_for_tokens
 
 parser = argparse.ArgumentParser(prog='kiteHistory')
 parser.add_argument('-s', '--symbol', action='store', type=str,
