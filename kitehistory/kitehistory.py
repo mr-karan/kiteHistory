@@ -13,8 +13,8 @@ from kiteconnect import KiteConnect
 
 from bokeh.plotting import figure, output_file, show
 
-from .config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
-from .scaffold import *
+from config import KITE_API_KEY, KITE_REQUEST_TOKEN, KITE_SECRET
+from scaffold import log,check_for_tokens
 
 parser = argparse.ArgumentParser(prog='kiteHistory')
 parser.add_argument('-s', '--symbol', action='store', type=str,
@@ -72,8 +72,7 @@ def initialize_kite():
 
     except FileNotFoundError:
         try:
-            user = kite.request_access_token(
-                request_token=KITE_REQUEST_TOKEN, secret=KITE_SECRET)
+            user = kite.generate_session(KITE_REQUEST_TOKEN, api_secret=KITE_SECRET)
         except Exception as e:
             log.error("{}".format(str(e)))
             exit()
@@ -126,7 +125,7 @@ def get_history(kite_instance, symbol, from_date, to_date, interval, exchange):
         result = df.query(
             "tradingsymbol=='{0}' and exchange=='{1}'".format(symbol, exchange))
         token = result.iloc[0][0]
-        result_data = kite_instance.historical(
+        result_data = kite_instance.historical_data(
             token, from_date, to_date, interval)
         return result_data
 
